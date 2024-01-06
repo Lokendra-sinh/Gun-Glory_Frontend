@@ -1,5 +1,387 @@
 import io from "socket.io-client";
 
+//init code
+
+const welcomeModal = document.querySelector('.welcome-modal');
+const modalGuestButton = document.querySelector('.modal-guest-button');
+const guestButton = document.querySelector('.guest-button');
+
+const createRoomBtn = document.querySelector('.create-room-button');
+const joinRoomBtn = document.querySelector('.join-room-button');
+const createRoomModal = document.querySelector('.create-room-modal');
+const createRoomModalButton = document.querySelector('.create-room-modal-button');
+const createRoomModalInput = document.querySelector('.create-room-modal-input');
+const closeCreateRoomModalButton = document.querySelector('.close-create-room-modal-button');
+const joinRoomModal = document.querySelector('.join-room-modal');
+const joinRoomModalButton = document.querySelector('.join-room-modal-button');
+const joinRoomModalInput = document.querySelector('.join-room-modal-input');
+const closeJoinRoomModalButton = document.querySelector('.close-join-room-modal-button');
+
+
+const roomLobbyOverlay = document.querySelector('.room-lobby-overlay');
+const roomLobby = document.querySelector('.room-lobby');
+const roomLobbyHeaderText = document.querySelector('.room-lobby-header-text');
+const roomLobbyLeaveButton = document.querySelector('.room-lobby-leave-button');
+const roomLobbyStartButton = document.querySelector('.room-lobby-start-button');
+
+const playersContainer = document.querySelector('.players-container');
+
+//room error modal and elements
+
+const roomErrorOverlay = document.querySelector('.room-error-overlay');
+const roomErrorText = document.querySelector('.room-error-text');
+const roomErrorButton = document.querySelector('.room-error-button');
+
+//game over modal and elements
+
+const gameOverOverlay = document.querySelector('.game-over-overlay');
+const gameOverModal = document.querySelector('.game-over-modal');
+const gameOverText = document.querySelector('.game-over-text');
+const gameOverCloseButton = document.querySelector('.game-over-close-button');
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext("2d");
+const dpi = window.devicePixelRatio || 1;
+canvas.width = 1024;
+canvas.height = 576;
+ctx.scale(dpi, dpi);
+
+let isWelcomeModalOpen = false;
+let isCreateRoomModalOpen = false;
+let isJoinRoomModalOpen = false;
+
+let gameStarted = false;
+let userLoggedIn = false;
+
+const URL = "https://gunglory-38nc.onrender.com";
+const rooms = {};
+const user = {
+    name: '',
+    email: '',
+};
+
+
+
+function handleWelcomeModalVisibility(){
+    welcomeModal.style.display = isWelcomeModalOpen ? 'flex' : 'none';
+  }
+
+modalGuestButton.addEventListener('click', ()=> {
+    isWelcomeModalOpen = false;
+    handleWelcomeModalVisibility();
+    canvas.style.display = 'flex';
+})
+
+closeCreateRoomModalButton.addEventListener('click', ()=> {
+    createRoomModalInput.value = '';
+    createRoomModal.style.display = 'none';
+})
+
+closeJoinRoomModalButton.addEventListener('click', ()=> {
+    joinRoomModalInput.value = '';
+    joinRoomModal.style.display = 'none';
+})
+
+
+//event listeners to handle modal closing
+
+window.addEventListener('click', (e)=> {
+    if(roomLobbyOverlay.style.display === 'flex' && !roomLobby.contains(e.target)){
+        roomLobbyOverlay.style.display = 'none';
+        gameStarted = false;
+        socket.emit('gameStopped', roomId);
+    }
+});
+
+//init code ends
+
+
+//auth code starts
+
+
+import axios from "axios";
+
+const authButton = document.querySelector(".auth-button");
+const authModal = document.querySelector(".auth-modal");
+const loginForm = document.querySelector(".login-form");
+const signupForm = document.querySelector(".signup-form");
+const signupButton = document.getElementById("signup-button");
+const loginButton = document.getElementById("login-button");
+const formToggleBtn = document.querySelector(".form-toggle-button");
+const formToggleText = document.querySelector(".form-toggle-text");
+const loginSpinner = document.querySelector(".login-spinner");
+const signupSpinner = document.querySelector(".signup-spinner");
+
+//email verification modal elements
+
+const emailVerificationModalOverlay = document.querySelector(
+  ".email-verification-modal-overlay"
+);
+const emailVerificationForm = document.querySelector(
+  ".email-verification-form"
+);
+const emailVerificationSpinner = document.querySelector(
+  ".email-verification-spinner"
+);
+const closeEmailVerificationModalButton = document.querySelector(
+  ".close-email-verification-modal-button"
+);
+
+//verification result message elements
+
+const verificationSuccessMessage = document.querySelector(
+  ".verification-success"
+);
+const verificationFailureMessage = document.querySelector(
+  ".verification-failure"
+);
+
+let isAuthModalOpen = false;
+let isSignUpModalOpen = false;
+let isLoginModalOpen = false;
+let isEmailVerificationModalOpen = false;
+
+// automatic user login based on token value
+
+fetchUserData();
+
+async function fetchUserData() {
+
+    const token = localStorage.getItem("token");
+    console.log("token from handleUserlogin is: ", token);
+    if(!token){
+        console.log("no token found");
+        return;
+    }
+
+    try {
+      const response = await axios.post(
+        URL + "/login",
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token,
+          },
+        }
+      );
+  
+      const userData = await response.data;
+      console.log("user data is: ", userData);
+      user.name = userData.name;
+      user.email = userData.email;
+      guestButton.textContent = user.name;
+      userLoggedIn = true;
+      authButton.textContent = 'Logout';
+  
+    } catch (error) {
+      console.log("error while logging user: ", error);
+    }
+  }
+
+function handleAuthModalVisibility() {
+  authModal.style.display = isAuthModalOpen ? "flex" : "none";
+  loginForm.style.display = isLoginModalOpen ? "flex" : "none";
+  signupForm.style.display = isSignUpModalOpen ? "flex" : "none";
+  formToggleBtn.textContent = isSignUpModalOpen ? "Sign in" : "Sign Up";
+  formToggleText.textContent = isSignUpModalOpen
+    ? `Already have an account?`
+    : `Don't have an account?`;
+
+    loginForm.reset();
+    signupForm.reset();
+}
+
+function handleEmailVerificationModalVisibility() {
+  emailVerificationModalOverlay.style.display = isEmailVerificationModalOpen
+    ? "flex"
+    : "none";
+}
+
+async function handleEmailVerification(verificationCode) {
+  try {
+    const response = await axios.post(
+      URL + "/verify-email",
+      {
+        verificationCode,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const userData = await response.data;
+    console.log("user data is: ", userData);
+    console.log("token is: ", userData.token);
+    
+    localStorage.setItem("token", userData.token);
+    verificationSuccessMessage.style.display = "flex";
+    setTimeout(() => {
+      verificationSuccessMessage.style.display = "none";
+      isEmailVerificationModalOpen = false;
+      handleEmailVerificationModalVisibility();
+      isAuthModalOpen = true;
+      isLoginModalOpen = true;
+      isSignUpModalOpen = false;
+      handleAuthModalVisibility();
+    }, 2000);
+  } catch (error) {
+    console.log("error while verifying email: ", error);
+    verificationFailureMessage.style.display = "flex";
+  }
+}
+
+emailVerificationForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  // emailVerificationSpinner.style.display = 'flex';
+  const verificationCode = document
+    .querySelector(".email-verification-otp")
+    .value.trim("");
+  handleEmailVerification(verificationCode);
+});
+
+authButton.addEventListener("click", (event) => {
+  event.preventDefault();
+
+  //if user is already logged in, log them out
+
+  if(userLoggedIn){
+    userLoggedIn = false;
+    authButton.textContent = 'Sign in/up';
+    guestButton.textContent = 'Guest';
+    return;
+  }
+
+  isAuthModalOpen = !isAuthModalOpen;
+  if (isAuthModalOpen) {
+    isLoginModalOpen = true;
+    isSignUpModalOpen = false;
+  }
+  handleAuthModalVisibility();
+});
+
+formToggleBtn.addEventListener("click", (event) => {
+  event.preventDefault();
+  if (isSignUpModalOpen) {
+    isSignUpModalOpen = false;
+    isLoginModalOpen = true;
+  } else {
+    isSignUpModalOpen = true;
+    isLoginModalOpen = false;
+  }
+  handleAuthModalVisibility();
+});
+
+signupForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+  signupSpinner.style.display = "flex";
+  console.log("inside signup form: ", signupButton);
+  signupButton.disabled = true;
+  extractSignupFormValues();
+});
+
+loginForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+  loginSpinner.style.display = "flex";
+  console.log("inside login form: ", loginButton);
+  loginButton.disabled = true;
+  extractLoginFormValues();
+});
+
+closeEmailVerificationModalButton.addEventListener("click", (event) => {
+  isEmailVerificationModalOpen = false;
+  handleEmailVerificationModalVisibility();
+});
+
+async function handleUserRegistration(name, email, password) {
+  console.log("inside handleUserRgistration");
+  try {
+    const response = await axios.post(
+      URL + "/register",
+      {
+        name,
+        email,
+        password,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    isAuthModalOpen = false;
+    signupSpinner.style.display = "none";
+    signupButton.disabled = false;
+    handleAuthModalVisibility();
+    isEmailVerificationModalOpen = true;
+    handleEmailVerificationModalVisibility();
+  } catch (error) {
+    console.log("error is: ", error);
+    // spinner.style.display = "none";
+  }
+}
+
+async function handleUserLogin(email, password) {
+  try {
+    const token = localStorage.getItem("token");
+    console.log("token from handleUserlogin is: ", token);
+    const response = await axios.post(
+      URL + "/login",
+      {
+        email,
+        password,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token,
+        },
+      }
+    );
+
+    const userData = await response.data;
+    console.log("user data is: ", userData);
+
+    setTimeout(() => {
+      loginSpinner.style.display = "none";
+      loginButton.disabled = false;
+      isAuthModalOpen = false;
+    handleAuthModalVisibility();
+    }, 2000);
+
+    user.name = userData.name;
+    user.email = userData.email;
+    guestButton.textContent = user.name;
+
+  } catch (error) {
+    console.log("error while logging user: ", error);
+  }
+}
+async function extractSignupFormValues() {
+  const name = document.getElementById("signup-name").value.trim("");
+  const email = document.getElementById("signup-email").value.trim("");
+  const password = document.getElementById("signup-password").value.trim("");
+  console.log("inside extactSignUpForm");
+  await handleUserRegistration(name, email, password);
+}
+
+async function extractLoginFormValues() {
+  const email = document.getElementById("login-email").value.trim("");
+  const password = document.getElementById("login-password").value.trim("");
+  await handleUserLogin(email, password);
+
+  console.log("Login Form Values:");
+  console.log("Email:", email);
+  console.log("Password:", password);
+}
+
+
+
+//auth code ends
+
 const socket = io("https://gunglory-38nc.onrender.com/");
 
 const frontendPlayers = {};

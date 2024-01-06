@@ -1,5 +1,5 @@
 // @import './geist/font/sans';
-@import './styles/fonts.scss';
+// @import './styles/fonts.scss';
 @import './styles/room.scss';
 @import './styles/authModals.scss';
 @import './styles/roomLobby.scss';
@@ -24,7 +24,7 @@
 
 :root {
   --main-font: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  --geist-font: 'GeistSans', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  // --geist-font: 'GeistSans', system-ui, Avenir, Helvetica, Arial, sans-serif;
   --line-height: 1.5;
   --font-weight: 400;
 
@@ -42,7 +42,7 @@
 *{
   margin: 0;
   padding: 0;
-  font-family: var(--geist-font);
+  font-family: var(--main-font);
   line-height: var(--line-height);
   font-weight: medium;
   font-size: 0.9rem;
