@@ -1,0 +1,251 @@
+// @import './geist/font/sans';
+@import './styles/fonts.scss';
+@import './styles/room.scss';
+@import './styles/authModals.scss';
+@import './styles/roomLobby.scss';
+@import './styles/roomError.scss';
+@import './styles/emailVerificationModal.scss';
+@import './styles/gameOverModal.scss';
+
+
+@mixin buttonStyles {
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+@mixin flex{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+:root {
+  --main-font: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --geist-font: 'GeistSans', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --line-height: 1.5;
+  --font-weight: 400;
+
+  --color-scheme: light dark;
+  --text-color: #EBEBEB;
+  --purple: #9333ea;
+  --background-color: #242424;
+
+  --font-synthesis: none;
+  --text-rendering: optimizeLegibility;
+  --webkit-font-smoothing: antialiased;
+  --moz-osx-font-smoothing: grayscale;
+}
+
+*{
+  margin: 0;
+  padding: 0;
+  font-family: var(--geist-font);
+  line-height: var(--line-height);
+  font-weight: medium;
+  font-size: 0.9rem;
+  
+  --font-synthesis: none;
+  --text-rendering: optimizeLegibility;
+  --webkit-font-smoothing: antialiased;
+  --moz-osx-font-smoothing: grayscale;
+
+  color: var(--text-color);
+}
+
+html, body{
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+body {
+
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  // justify-content: space-between; 
+  align-items: center;
+  gap: 3rem;
+}
+
+.navbar{
+  background-color: black;
+  width: 100%;
+  height: 80px;
+  padding: 0.2rem 2rem; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #2d3748;
+
+  button{
+    font-size: 15px;
+  }
+}
+
+.logo{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img{
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+  }
+
+  h1{
+    font-size: 20px;
+    font-weight: bolder;
+    color: white; 
+  }
+}
+
+.navbar-right-buttons{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  gap: 1rem;
+}
+
+.create-room-button{
+  @include buttonStyles;
+  background-color: var(--purple); // bg-blue-500 color in Tailwind
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  p{
+    font-size: 15px;
+    font-family: var(--main-font);
+    font-weight: 500;
+  }
+}
+
+.join-room-button{
+  @include buttonStyles;
+  background-color: var(--purple); // bg-blue-500 color in Tailwind
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  p{
+    font-size: 15px;
+    font-family: var(--main-font);
+    font-weight: 500;
+  }
+}
+
+.auth{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .auth-button{
+    @include buttonStyles;
+    background-color: transparent;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    p{
+      font-size: 15px;
+      font-family: var(--main-font);
+      font-weight: 500;
+    }
+  }
+
+  .guest-button{
+    @include buttonStyles;
+  background-color: var(--purple); // bg-blue-500 color in Tailwind
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  p{
+    font-size: 15px;
+    font-family: var(--main-font);
+    font-weight: 500;
+  }
+  }
+}
+
+.welcome-modal{
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  align-items: center;
+  background-color: rgb(31 41 55);
+  padding: 1rem 2rem;
+  border-radius: 5px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  button{
+    @include buttonStyles;
+    font-size: 16px;
+    width: fit-content;
+    margin-top: 2rem;
+    background-color: rgb(209 213 219);
+    color: black;
+
+    &:hover{
+      background-color: rgba(209, 213, 219, 0.8);
+      color: black;
+    }
+  }
+
+}
+
+.welcome-text{
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 0.5rem;
+
+h2{
+  font-size: 24px;
+  color: var(--text-color);
+  font-family: var(--main-font);
+}
+
+p{
+  font-size: 16px;
+  color: rgb(209 213 219);
+}
+}
+
+.body-container{
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 80px); // Ensure it takes at least the full height of the viewport
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 2rem;
+}
+  
+  #canvas {
+    z-index: 0;
+  width: 1024px;
+  height: 576px;
+  background-color: rgba(0, 0, 0, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  }
