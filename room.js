@@ -1,7 +1,7 @@
 import io from "socket.io-client";
 import axios from "axios";
 
-const socket = io("https://gunglory-znay.onrender.com/");
+const socket = io("https://gunglory-znay.onrender.com");
 
 
 //init code
@@ -57,7 +57,7 @@ let isJoinRoomModalOpen = false;
 let gameStarted = false;
 let userLoggedIn = false;
 
-const URL = "https://gunglory-znay.onrender.com/";
+const URL = "https://gunglory-znay.onrender.com";
 const rooms = {};
 const user = {
     name: '',
