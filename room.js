@@ -480,7 +480,9 @@ createRoomModalButton.addEventListener("click", (e) => {
   hostId = socket.id;
   if(!roomId) return alert('Please enter a room id');
   const playerName = user.name ? user.name : 'Guest';
-  socket.emit("createRoom", roomId, playerName);
+  const sentTime = new Date.now();
+  console.log("create room sent time: ", sentTime)
+  socket.emit("createRoom", roomId, playerName, sentTime);
   updateGameStartButtonState();
   handleCreateRoomModalVisibility();
 });
@@ -531,7 +533,10 @@ socket.on("connect", () => {
   console.log("client connected successfully: ", socket.id);
 });
 
-socket.on("roomCreated", (roomId) => {
+socket.on("roomCreated", (roomId, sentTime) => {
+  const receivedTime = new Date.now();
+  const totalTime = receivedTime - sentTime;
+  console.log("total time taken: ", totalTime);
   console.log("room created with roomId: ", roomId);
   hostId = socket.id;
 });
