@@ -1,4 +1,8 @@
 import io from "socket.io-client";
+import axios from "axios";
+
+const socket = io("https://gunglory-znay.onrender.com/");
+
 
 //init code
 
@@ -53,7 +57,7 @@ let isJoinRoomModalOpen = false;
 let gameStarted = false;
 let userLoggedIn = false;
 
-const URL = "https://gunglory-38nc.onrender.com";
+const URL = "https://gunglory-znay.onrender.com/";
 const rooms = {};
 const user = {
     name: '',
@@ -97,9 +101,6 @@ window.addEventListener('click', (e)=> {
 
 
 //auth code starts
-
-
-import axios from "axios";
 
 const authButton = document.querySelector(".auth-button");
 const authModal = document.querySelector(".auth-modal");
@@ -382,8 +383,6 @@ async function extractLoginFormValues() {
 
 //auth code ends
 
-const socket = io("https://gunglory-38nc.onrender.com/");
-
 const frontendPlayers = {};
 let frontendBullets = {};
 const keys = {
@@ -509,7 +508,7 @@ roomLobbyLeaveButton.addEventListener("click", (e) => {
 roomLobbyStartButton.addEventListener("click", (e) => {
   e.stopPropagation();
   if(hostId !== socket.id){
-    room
+    return alert('Only host can start the game');
   }
   // if(Object.keys(frontendPlayers).length < 2) return alert('Atleast 2 players are required to start the game');
   socket.emit("gameStarted", roomId);
