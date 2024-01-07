@@ -57,7 +57,7 @@ let isJoinRoomModalOpen = false;
 let gameStarted = false;
 let userLoggedIn = false;
 
-const URL = "https://gunglory.onrender.com/";
+const URL = "https://gunglory.onrender.com";
 const rooms = {};
 const user = {
     name: '',
