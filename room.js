@@ -690,14 +690,9 @@ socket.on("playerHit", (playerId) => {
 socket.on("playerWon", (playerId) => {
   if(frontendPlayers[playerId]) {
     delete frontendPlayers[playerId];
-    setTimeout(() => {
-      if(playerId === socket.id) {
-        roomId = '';
-        gameStarted = false;
-        gameOverOverlay.style.display = 'flex';
-        gameOverText.textContent = 'Congratulations. You Won!';
-      }
-    }, 1500);
+    showConfettiCelebration(playerId);
+    gameOverOverlay.style.display = 'flex';
+    gameOverText.textContent = 'Congratulations. You Won!';
   }
 });
 
@@ -752,36 +747,10 @@ function updatePlayersPosition() {
   }
 }
 
+const throttleBulletFired = throttle(bulletFired, 250);
+
 canvas.addEventListener("click", (event) => {
-  // if(!GameStarted) return;
-  const c = canvas.getBoundingClientRect();
-  // console.log("canvas: ", c.top, c.left);
-  const player = {
-    x: frontendPlayers[socket.id].x,
-    y: frontendPlayers[socket.id].y,
-  };
-  console.log(
-    "player: ",
-    frontendPlayers[socket.id].x,
-    frontendPlayers[socket.id].y
-  );
-
-  const mouseX = (event.clientX - c.left) / dpi;
-  const mouseY = (event.clientY - c.top) / dpi;
-
-  console.log("mousecanvas: ", mouseX, mouseY);
-  const shotAngle = Math.atan2(mouseY - player.y, mouseX - player.x);
-  console.log(shotAngle);
-
-  const bullet = {
-    x: player.x,
-    y: player.y,
-    angle: shotAngle,
-    roomId,
-  };
-
-  console.log("bullet: ", bullet.x, bullet.y);
-  socket.emit("addBullet", bullet);
+  throttleBulletFired(event);
 });
 
 function animate() {
@@ -884,3 +853,118 @@ function createParticles(x, y){
      
     }
   })
+
+  function throttle(func, limit){
+   let inThrottle;
+   return function(...args){
+    const context = this;
+    if(!inThrottle){
+      func.apply(context, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+   }
+  }
+
+  function bulletFired(event){
+    const c = canvas.getBoundingClientRect();
+  // console.log("canvas: ", c.top, c.left);
+  const player = {
+    x: frontendPlayers[socket.id].x,
+    y: frontendPlayers[socket.id].y,
+  };
+  console.log(
+    "player: ",
+    frontendPlayers[socket.id].x,
+    frontendPlayers[socket.id].y
+  );
+
+  const mouseX = (event.clientX - c.left) / dpi;
+  const mouseY = (event.clientY - c.top) / dpi;
+
+  console.log("mousecanvas: ", mouseX, mouseY);
+  const shotAngle = Math.atan2(mouseY - player.y, mouseX - player.x);
+  console.log(shotAngle);
+
+  const bullet = {
+    x: player.x,
+    y: player.y,
+    angle: shotAngle,
+    roomId,
+  };
+
+  console.log("bullet: ", bullet.x, bullet.y);
+  socket.emit("addBullet", bullet);
+  }
+
+
+  //confetti celebration code
+
+  const confettiCanvas = document.getElementById('confetti');
+const confettiCtx = confettiCanvas.getContext('2d');
+let confettiAnimationId = null;
+confettiCanvas.width = window.innerWidth;
+confettiCanvas.height = window.innerHeight;
+
+const confettiPieces = [];
+const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+
+function createConfetti() {
+  const x = Math.random() * confettiCanvas.width;
+  const y = Math.random() * confettiCanvas.height - confettiCanvas.height;
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  const width = Math.random() * 10;
+  const height = Math.random() * 10;
+  const velocityX = Math.random() * 2 - 1; // Horizontal velocity
+  const velocityY = Math.random() * 5 + 2; // Vertical velocity
+
+  confettiPieces.push({x, y, color, width, height, velocityX, velocityY});
+}
+
+function drawConfetti() {
+  confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confettiPieces.forEach((piece, index) => {
+    confettiCtx.fillStyle = piece.color;
+    confettiCtx.fillRect(piece.x, piece.y, piece.width, piece.height);
+
+    // Update confetti piece position
+    piece.x += piece.velocityX;
+    piece.y += piece.velocityY;
+
+    // Remove confetti piece when out of frame
+    if (piece.y > confettiCanvas.height) {
+      confettiPieces.splice(index, 1);
+    }
+  });
+}
+
+function animateConfetti() {
+  drawConfetti();
+  confettiAnimationId = requestAnimationFrame(animateConfetti);
+}
+// Resize listener for the canvas to fill browser window dynamically
+window.addEventListener('resize', () => {
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+});
+
+function showConfettiCelebration(playerId){
+  confettiCanvas.style.display = 'flex';
+  confettiPieces.length = 0;
+  for (let i = 0; i < 350; i++) {
+    createConfetti();
+  }
+
+  animateConfetti();
+    setTimeout(() => {
+      if (playerId === socket.id) {
+        roomId = '';
+        gameStarted = false;
+        gameOverOverlay.style.display = 'none';
+        cancelAnimationFrame(confettiAnimationId);
+        confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        confettiCanvas.style.display = 'none';
+      }
+    }, 3500);
+  
+}
