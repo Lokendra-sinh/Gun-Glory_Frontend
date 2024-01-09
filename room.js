@@ -1,8 +1,8 @@
 import io from "socket.io-client";
 import axios from "axios";
 
-// const socket = io("http://ec2-13-233-165-62.ap-south-1.compute.amazonaws.com");
-const socket = io("http://localhost:8080");
+const socket = io("http://ec2-13-233-165-62.ap-south-1.compute.amazonaws.com");
+// const socket = io("http://localhost:8080");
 
 
 //init code
@@ -57,8 +57,8 @@ let isJoinRoomModalOpen = false;
 
 let gameStarted = false;
 
-// const URL = "http://ec2-13-233-165-62.ap-south-1.compute.amazonaws.com";
-const URL = "http://localhost:8080";
+const URL = "http://ec2-13-233-165-62.ap-south-1.compute.amazonaws.com";
+// const URL = "http://localhost:8080";
 const user = {
     name: '',
     email: '',
