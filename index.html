@@ -17,10 +17,8 @@
       <div class="navbar-right-buttons">
         <button class="create-room-button"><p>Create Room</p></button>
         <button class="join-room-button"><p>Join Room</p></button>
-        <div class="auth">
-          <button class="auth-button"><p>sign in/up</p></button>
-          <button class="guest-button"><p>Guest</p></button>
-        </div>
+          <button class="auth-button"><p class="auth-button-text">sign in/up</p></button>
+          <button class="guest-button"><p class="guest-button-text">Guest</p></button>
       </div>
     </nav>
 
@@ -67,7 +65,7 @@
     </div>
 
     <div class="auth-modal">
-      <form class="login-form">
+      <form autocomplete="off" class="login-form">
         <h2>Sign In</h2>
         <p class="heading">Please enter your details:</p>
         <div class="field-container">
@@ -86,7 +84,7 @@
         </div>
       </form>
 
-      <form class="signup-form">
+      <form autocomplete="off" class="signup-form">
         <h2>Sign Up</h2>
         <p class="heading">Please enter your details:</p>
         <div class="field-container">
@@ -98,6 +96,27 @@
             placeholder="Password"
             required
           />
+          
+           <ul class="password-criteria-list">
+             <li class="password-length">
+              <div class="password-length-indicator"></div>
+              <p>At least 8 characters long</p>
+             </li>
+             <li class="password-case">
+              <div class="password-case-indicator"></div>
+              <p>At least 1 uppercase and 1 lowercase letter</p>
+             </li>
+             <li class="password-number">
+              <div class="password-number-indicator"></div>
+              <p>At least one number</p>
+             </li>
+             <li class="password-special-character">
+              <div class="password-special-character-indicator"></div>
+              <p>At least one special character</p>
+             </li>
+            </ul>
+          
+
           <button id="signup-button" type="submit">
             <div class="signup-spinner"></div>
             <p>Sign Up</p>
@@ -107,7 +126,7 @@
 
       <div class="form-toggle">
         <p class="form-toggle-text">Don't have an account?</p>
-        <button class="form-toggle-button">Sign Up</button>
+        <button class="form-toggle-button"><p>Sign Up</p></button>
       </div>
     </div>
 

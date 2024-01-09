@@ -1,7 +1,8 @@
 import io from "socket.io-client";
 import axios from "axios";
 
-const socket = io("https://gunglory.onrender.com");
+// const socket = io("http://ec2-13-233-165-62.ap-south-1.compute.amazonaws.com");
+const socket = io("http://localhost:8080");
 
 
 //init code
@@ -55,13 +56,13 @@ let isCreateRoomModalOpen = false;
 let isJoinRoomModalOpen = false;
 
 let gameStarted = false;
-let userLoggedIn = false;
 
-const URL = "https://gunglory.onrender.com";
-const rooms = {};
+// const URL = "http://ec2-13-233-165-62.ap-south-1.compute.amazonaws.com";
+const URL = "http://localhost:8080";
 const user = {
     name: '',
     email: '',
+    loggedIn: false,
 };
 
 
@@ -103,6 +104,8 @@ window.addEventListener('click', (e)=> {
 //auth code starts
 
 const authButton = document.querySelector(".auth-button");
+const authButtonText = document.querySelector(".auth-button-text");
+const guestButtonText = document.querySelector(".guest-button-text");
 const authModal = document.querySelector(".auth-modal");
 const loginForm = document.querySelector(".login-form");
 const signupForm = document.querySelector(".signup-form");
@@ -112,6 +115,49 @@ const formToggleBtn = document.querySelector(".form-toggle-button");
 const formToggleText = document.querySelector(".form-toggle-text");
 const loginSpinner = document.querySelector(".login-spinner");
 const signupSpinner = document.querySelector(".signup-spinner");
+
+const passwordLengthIndicator = document.querySelector(".password-length-indicator");
+const passwordCaseIndicator = document.querySelector(".password-case-indicator");
+const passwordNumberIndicator = document.querySelector(".password-number-indicator");
+const passwordSpecialCharacterIndicator = document.querySelector(".password-special-character-indicator");
+
+const signupPasswordInput = document.getElementById("signup-password");
+
+signupPasswordInput.addEventListener("input", function (event) {
+  const password = event.target.value.trim();
+
+  if (password.length >= 8) {
+    passwordLengthIndicator.style.backgroundColor = "#84cc16";
+  } else {
+    passwordLengthIndicator.style.backgroundColor = "#dc2626";
+  }
+
+  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    passwordSpecialCharacterIndicator.style.backgroundColor = "#84cc16";
+  } else {
+    passwordSpecialCharacterIndicator.style.backgroundColor = "#dc2626";
+  }
+
+  if (/\d/.test(password)) {
+    passwordNumberIndicator.style.backgroundColor = "#84cc16";
+  } else {
+    passwordNumberIndicator.style.backgroundColor = "#dc2626";
+  }
+
+  if (/[A-Z]/.test(password)) {
+    passwordCaseIndicator.style.backgroundColor = "#84cc16";
+  } else {
+    passwordCaseIndicator.style.backgroundColor = "#dc2626";
+  }
+});
+
+function resetPasswordIndicators() {
+  passwordLengthIndicator.style.backgroundColor = "#dc2626";
+  passwordCaseIndicator.style.backgroundColor = "#dc2626";
+  passwordNumberIndicator.style.backgroundColor = "#dc2626";
+  passwordSpecialCharacterIndicator.style.backgroundColor = "#dc2626";
+}
+
 
 //email verification modal elements
 
@@ -171,9 +217,9 @@ async function fetchUserData() {
       console.log("user data is: ", userData);
       user.name = userData.name;
       user.email = userData.email;
-      guestButton.textContent = user.name;
-      userLoggedIn = true;
-      authButton.textContent = 'Logout';
+      user.loggedIn = true;
+      guestButtonText.textContent = user.name;
+      authButtonText.textContent = 'Logout';
   
     } catch (error) {
       console.log("error while logging user: ", error);
@@ -248,10 +294,10 @@ authButton.addEventListener("click", (event) => {
 
   //if user is already logged in, log them out
 
-  if(userLoggedIn){
-    userLoggedIn = false;
-    authButton.textContent = 'Sign in/up';
-    guestButton.textContent = 'Guest';
+  if(user.loggedIn){
+    user.loggedIn = false;
+    authButtonText.textContent = 'Sign in/up';
+    guestButtonText.textContent = 'Guest';
     return;
   }
 
@@ -259,6 +305,8 @@ authButton.addEventListener("click", (event) => {
   if (isAuthModalOpen) {
     isLoginModalOpen = true;
     isSignUpModalOpen = false;
+    signupForm.reset();
+    resetPasswordIndicators();
   }
   handleAuthModalVisibility();
 });
@@ -267,10 +315,13 @@ formToggleBtn.addEventListener("click", (event) => {
   event.preventDefault();
   if (isSignUpModalOpen) {
     isSignUpModalOpen = false;
+    signupForm.reset();
+    resetPasswordIndicators();
     isLoginModalOpen = true;
   } else {
     isSignUpModalOpen = true;
     isLoginModalOpen = false;
+    loginForm.reset();
   }
   handleAuthModalVisibility();
 });
@@ -320,8 +371,10 @@ async function handleUserRegistration(name, email, password) {
     isEmailVerificationModalOpen = true;
     handleEmailVerificationModalVisibility();
   } catch (error) {
-    console.log("error is: ", error);
-    // spinner.style.display = "none";
+    console.log("error while registering user: ", error);
+    alert(error.message);
+    signupSpinner.style.display = "none";
+    signupButton.disabled = false;
   }
 }
 
@@ -365,18 +418,16 @@ async function extractSignupFormValues() {
   const name = document.getElementById("signup-name").value.trim("");
   const email = document.getElementById("signup-email").value.trim("");
   const password = document.getElementById("signup-password").value.trim("");
-  console.log("inside extactSignUpForm");
+  signupForm.reset();
+  resetPasswordIndicators();
   await handleUserRegistration(name, email, password);
 }
 
 async function extractLoginFormValues() {
   const email = document.getElementById("login-email").value.trim("");
   const password = document.getElementById("login-password").value.trim("");
+  loginForm.reset();
   await handleUserLogin(email, password);
-
-  console.log("Login Form Values:");
-  console.log("Email:", email);
-  console.log("Password:", password);
 }
 
 
@@ -451,11 +502,11 @@ function updateGameStartButtonState() {
   }
 }
 
-
-// roomErrorButton.addEventListener("click", () => {
-//   roomErrorOverlay.style.display = "none";
-//   joinRoomModalInput.value = "";
-// });
+roomErrorButton.addEventListener("click", () => {
+  roomErrorOverlay.style.display = "none";
+  joinRoomModalInput.value = "";
+  isJoinRoomModalOpen = true;
+});
 
 createRoomBtn.addEventListener("click", () => {
   isCreateRoomModalOpen = !isCreateRoomModalOpen;
@@ -807,10 +858,29 @@ function createParticles(x, y){
        return particles.filter(particle => particle.lifeSpan > 0);
   }
 
-  // window.addEventListener('resize', () => {
-  //   const oldWidth = canvas.width;
-  //   const oldHeight = canvas.height;
-  //   canvas.width = window.innerWidth;
-  //   canvas.height = window.innerHeight;
-  //   ctx ? ctx.scale(canvas.width / oldWidth, canvas.height / oldHeight) : '';
-  // });
+
+  window.addEventListener('click', (e) => {
+    if(!authButton.contains(e.target) && isAuthModalOpen && !authModal.contains(e.target)){
+      isSignUpModalOpen = false;
+      isAuthModalOpen = false;
+      isLoginModalOpen = false;
+      signupForm.reset();
+      loginForm.reset();
+      resetPasswordIndicators();
+      handleAuthModalVisibility();
+    }
+
+    if(!createRoomBtn.contains(e.target) && isCreateRoomModalOpen && !createRoomModal.contains(e.target)){
+      isCreateRoomModalOpen = false;
+      createRoomModalInput.value = '';
+      createRoomModal.style.display = 'none';
+      
+    }
+
+    if(!joinRoomBtn.contains(e.target) && isJoinRoomModalOpen && !joinRoomModal.contains(e.target)){
+      isJoinRoomModalOpen = false;
+      joinRoomModalInput.value = '';
+      joinRoomModal.style.display = 'none';
+     
+    }
+  })
