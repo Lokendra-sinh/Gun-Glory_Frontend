@@ -1,8 +1,8 @@
 import io from "socket.io-client";
 import axios from "axios";
 
-const socket = io("http://ec2-13-233-165-62.ap-south-1.compute.amazonaws.com");
-// const socket = io("http://localhost:8080");
+const socket = io("https://gunglory.shop");
+
 
 
 //init code
@@ -57,8 +57,7 @@ let isJoinRoomModalOpen = false;
 
 let gameStarted = false;
 
-const URL = "http://ec2-13-233-165-62.ap-south-1.compute.amazonaws.com";
-// const URL = "http://localhost:8080";
+const URL = "https://gunglory.shop";
 const user = {
     name: '',
     email: '',
@@ -132,11 +131,11 @@ signupPasswordInput.addEventListener("input", function (event) {
     passwordLengthIndicator.style.backgroundColor = "#dc2626";
   }
 
-  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+  if (/@|_/.test(password)) {
     passwordSpecialCharacterIndicator.style.backgroundColor = "#84cc16";
-  } else {
+} else {
     passwordSpecialCharacterIndicator.style.backgroundColor = "#dc2626";
-  }
+}
 
   if (/\d/.test(password)) {
     passwordNumberIndicator.style.backgroundColor = "#84cc16";
